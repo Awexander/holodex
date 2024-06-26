@@ -32,6 +32,8 @@ class MusicdexClient:
         exclude: Optional[list[str]] = None
     ) -> str:
         keys.pop("self")
+        cat = keys.get('type')
+
         if exclude:
             for key in exclude:
                 keys.pop(key)
@@ -40,7 +42,7 @@ class MusicdexClient:
             keys.pop('type')
 
         params = [f"{k}={v}" for k, v in keys.items() if v is not None]
-        return f":{type}[" + ",".join(params) + "]"
+        return f":{cat}[" + ",".join(params) + "]"
 
     async def close(self) -> None:
         if self.session:
@@ -97,17 +99,21 @@ class MusicdexClient:
     async def channels(
         self,
         *,
-        limit: Optional[int] = None,
+        channel_id: Optional[str] = None,
         offset: Optional[int] = None,
         type: Optional[Literal["vtuber"]] = None,
         order: Optional[Literal["asc", "desc"]] = None,
+        limit: Optional[int] = None,
         org: Optional[
             Literal["All Vtubers", "Hololive",
                     "Nijisanji", "Independents"]
         ] = None,
-        sort: Optional[Literal["latest", "random"]] = None,
+        sort: Optional[Literal["latest", "random", "suborg"]] = None,
     ) -> list[Channel]:
-        params = self.__get_body_params(locals())
+        params = self.__get_body_params(locals(), exclude=["channel_id"])
+        if channel_id:
+            endpoint = f'/{channel_id}'  # TODO : add channel details endpoint
+
         return [Channel(**r) for r in await self.session.get_channels(**params)]
 
     async def playlist(
