@@ -5,6 +5,7 @@ from musicdex.model.channels import Channel
 
 JSONDict = Dict[str, Any]
 
+
 @define(kw_only=True)
 class Video:
     id: Optional[str] = None
@@ -17,7 +18,7 @@ class Video:
     status: Optional[str] = None
     songcount: Optional[str] = None
     channel: Union[JSONDict, Channel, None] = None
-    
+
     def __attrs_post_init__(self):
         if self.channel and isinstance(self.channel, Dict):
             self.channel = Channel(**self.channel)

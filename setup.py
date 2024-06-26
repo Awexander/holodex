@@ -2,7 +2,6 @@ import setuptools
 from setuptools import setup
 import holodex
 
-
 setup(
     name="holodex",
     version=holodex.__version__,

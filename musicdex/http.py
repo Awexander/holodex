@@ -1,19 +1,26 @@
-from types import TracebackType
-from typing import Any, Optional, Type
 
+from typing import Any, Optional, Type
+from types import TracebackType
 from aiohttp import ClientSession
 from typing_extensions import Literal
 
+
 JSONDict = dict[str, Any]
+
 
 class MusicdexHttpClient:
     BASE_URL = "https://music.holodex.net/api/v2"
 
-    def __init__(
-        self, key: Optional[str] = None, session: Optional[ClientSession] = None
-    ) -> None:
-        self.session = session
+    def __init__(self, key: Optional[str] = None) -> None:
         self.key = key
+        self.session = ClientSession()
+
+    @property
+    def headers(self) -> dict[str, Any]:
+        headers: dict[str, Any] = {}
+        if self.key:
+            headers["X-APIKEY"] = self.key
+        return headers
 
     async def close(self) -> None:
         if self.session:
@@ -29,13 +36,6 @@ class MusicdexHttpClient:
         exc_tb: Optional[TracebackType],
     ) -> None:
         await self.close()
-
-    @property
-    def headers(self) -> dict[str, Any]:
-        headers: dict[str, Any] = {}
-        if self.key:
-            headers["X-APIKEY"] = self.key
-        return headers
 
     async def request(
         self,
@@ -54,19 +54,19 @@ class MusicdexHttpClient:
         ) as r:
             return await r.json()
 
-    async def get_trending(self, org: str = "Hololive") -> Any:
-        return await self.request("GET", f"/songs/hot?org={org}")
+    async def get_trending(self, **params: JSONDict) -> Any:
+        return await self.request("GET", f"/songs/hot", params=params)
 
-    async def get_discovery(self, org: str = "Hololive", **params: Any) -> Any:
-        return await self.request("GET", f"/musicdex/discovery/org/{org}", params=params)
-    
-    async def get_channels(self, **params: Any) -> Any:
+    async def get_discovery(self, endpoint: Optional[str] = None, **params: JSONDict) -> Any:
+        return await self.request("GET", f"/musicdex/discovery/{endpoint}", params=params)
+
+    async def get_channels(self, **params: JSONDict) -> Any:
         return await self.request(
             "GET", f"/channels", params={"limit": 100, "offset": 0, **params}
         )
-    
-    async def get_playlist(self, id: str) -> Any:
-        return await self.request("GET", F"/musicdex/playlist/{id}")
-    
-    async def get_radio(self, **params: JSONDict) -> Any:
-        return await self.get_discovery(params=params)
+
+    async def get_playlist(self, endpoint: str, **params: JSONDict) -> Any:
+        return await self.request("GET", F"/musicdex/playlist/{endpoint}", params=params)
+
+    async def get_radio(self, endpoint: Optional[str] = None, **params: JSONDict) -> Any:
+        return await self.request("GET", f"/musicdex/radio/{endpoint}", params=params)

@@ -3,11 +3,13 @@ from attrs import define
 
 JSONDict = Dict[str, Any]
 
-@define(kw_only=True) 
+
+@define(kw_only=True)
 class Channel:
     name: Optional[str] = None
     english_name: Optional[str] = None
-    
+
+
 @define(kw_only=True)
 class Content:
     score: Optional[int] = None
@@ -29,7 +31,7 @@ class Content:
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     channel: Union[JSONDict, Channel, None] = None
-    
+
     def __attrs_post_init__(self):
         if self.channel and isinstance(self.channel, Dict):
             self.channel = Channel(**self.channel)
