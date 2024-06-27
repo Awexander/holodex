@@ -52,6 +52,7 @@ class MusicdexHttpClient:
             headers=self.headers,
             **kwargs,
         ) as r:
+            print(f"Endpoint: {endpoint}")
             return await r.json()
 
     async def get_trending(self, **params: JSONDict) -> Any:
@@ -62,8 +63,10 @@ class MusicdexHttpClient:
 
     async def get_channels(self, **params: JSONDict) -> Any:
         return await self.request(
-            "GET", f"/channels", params={"limit": 100, "offset": 0, **params}
-        )
+            "GET", f"/channels", params={"limit": 100, "offset": 0, **params})
+
+    async def get_channels_details(self, endpoint: str, **params: JSONDict) -> Any:
+        return await self.request("GET", endpoint=f'/channels/{endpoint}', **params)
 
     async def get_playlist(self, endpoint: str, **params: JSONDict) -> Any:
         return await self.request("GET", F"/musicdex/playlist/{endpoint}", params=params)

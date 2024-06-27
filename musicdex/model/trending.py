@@ -1,7 +1,7 @@
 
 
-from typing import Optional, Union, Any, Dict
-from attrs import define
+from typing import Optional, Any, Dict
+from attrs import define, field
 
 from musicdex.model.base import BaseModel
 
@@ -15,6 +15,7 @@ class Channel(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
+
 
 @define(kw_only=True)
 class Content(BaseModel):
@@ -36,11 +37,11 @@ class Content(BaseModel):
     is_mv: Optional[bool] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
-    channel: Union[JSONDict, Channel, None] = None
+    channel: Optional[Channel] = None
+    __channel: Any = field(default=None, init=False, repr=False)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-    
-    def __attrs_post_init__(self):
-        if self.channel and isinstance(self.channel, Dict):
-            self.channel = Channel(**self.channel)
+        self.__channel: Any = kwargs.get('channel')
+        if self.__channel:
+            self.channel = Channel(**self.__channel)

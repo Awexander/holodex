@@ -17,29 +17,266 @@ class MusicdexClient:
     def __init__(self, key: Optional[str] = None) -> None:
         self.session = MusicdexHttpClient(key=key)
 
-    def __get_body_params(
-        self, keys: dict[str, Any],
-        exclude: Optional[list[str]] = None
-    ) -> dict[str, Any]:
-        keys.pop("self")
-        if exclude:
-            for key in exclude:
-                keys.pop(key)
-        return {k: v for k, v in keys.items() if v is not None}
+    @overload
+    async def hot(
+        self,
+        *,
+        org: Literal["All Vtubers", "Hololive",
+                     "Nijisanji", "Independents"]
+    ) -> list[Content]:
+        ...
 
-    def __get_path_params(
-        self, keys: dict[str, Any],
-        exclude: Optional[list[str]] = None
-    ) -> str:
-        keys.pop("self")
-        cat = keys.get('type')
+    @overload
+    async def hot(
+        self,
+        *,
+        channel_id: str
+    ) -> list[Content]:
+        ...
 
-        if exclude:
-            for key in exclude:
-                keys.pop(key)
+    @overload
+    async def hot(self) -> Playlist:
+        ...
 
-        params = [f"{k}={v}" for k, v in keys.items() if v is not None]
-        return f":{cat}[" + ",".join(params) + "]"
+    @overload
+    async def discovery(
+        self,
+        category: Literal["channel"],
+        *,
+        channel_id: str,
+    ) -> Discovery:
+        ...
+
+    @overload
+    async def discovery(
+        self,
+        category: Literal['org'],
+        *,
+        org: Literal["All Vtubers", "Hololive",
+                     "Nijisanji", "Independents"],
+    ) -> Discovery:
+        ...
+
+    @overload
+    async def channels(
+        self,
+        *,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ],
+        offset: Optional[str] = None,
+        limit: Optional[int] = None,
+        type: Optional[Literal["vtuber"]] = None,
+        order: Optional[Literal["asc", "desc"]] = None,
+        sort: Optional[Literal["latest", "random", "suborg"]] = None,
+    ) -> list[Channel]:
+        ...
+
+    @overload
+    async def channels(
+        self,
+        channel_id: str
+    ) -> list[Channel]:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["mv"],
+        *,
+        org: Literal["All Vtubers", "Hololive",
+                     "Nijisanji", "Independents"],
+        sort: Literal["random", "latest"]
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["dailyrandom"],
+        *,
+        channel_id: str
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["weekly"],
+        *,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ]
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["video"],
+        *,
+        video_id: str
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["latest"],
+        *,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ]
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["hot"],
+        *,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ]
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        category: Literal["artist"],
+        *,
+        channel_id: str
+    ) -> Playlist:
+        ...
+
+    @overload
+    async def playlist(
+        self,
+        *,
+        playlist_id: str
+    ) -> Playlist:
+        ...
+
+    async def hot(
+        self,
+        *,
+        channel_id: Optional[str] = None,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ] = None,
+    ) -> list[Content] | Playlist:
+        if channel_id and org:
+            raise ValueError("Either `channel_id` or `org` only.")
+
+        if not channel_id and org:
+            return await self.radio(category="hot")
+
+        params = self.__get_body_params(locals())
+        return [Content(**r) for r in await self.session.get_trending(**params)]
+
+    async def discovery(
+        self,
+        category: Literal["channel", "org"],
+        *,
+        channel_id: Optional[str] = None,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ] = None,
+    ) -> Discovery:
+        endpoint = {"channel": f"channel/{channel_id}", "org": f'org/{org}'}
+
+        if category == "channel" and not channel_id:
+            raise ValueError("`channel_id` is undefined.")
+
+        if category == 'org' and not org:
+            raise ValueError("`org` is undefined.")
+
+        params = self.__get_body_params(
+            locals(), exclude=["category", "channel_id", "org", 'endpoint'])
+        return Discovery(**await self.session.get_discovery(endpoint=endpoint.get(category), **params))
+
+    async def channels(  # type: ignore
+        self,
+        *,
+        channel_id: Optional[str] = None,
+        offset: Optional[int] = None,
+        type: Optional[Literal["vtuber"]] = None,
+        order: Optional[Literal["asc", "desc"]] = None,
+        limit: Optional[int] = None,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ] = None,
+        sort: Optional[Literal["latest", "random", "suborg"]] = None,
+    ) -> list[Channel] | Channel:
+        params = self.__get_body_params(locals(), exclude=["channel_id"])
+        if channel_id:
+            return Channel(**await self.session.get_channels_details(channel_id))
+
+        return [Channel(**r) for r in await self.session.get_channels(**params)]
+
+    async def playlist(
+        self,
+        category: Optional[
+            Literal["mv", "dailyrandom",
+                    "weekly", "video", "latest",
+                    "hot", "artist"]
+        ] = None,
+        *,
+        playlist_id: Optional[str] = None,
+        video_id: Optional[str] = None,
+        channel_id: Optional[str] = None,
+        sort: Optional[Literal["latest", "random"]] = None,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ] = None,
+    ) -> Playlist:
+        if playlist_id is not None:
+            params = playlist_id
+
+        else:
+            if category in ('weekly', 'mv', 'latest', 'hot') and not org:
+                raise ValueError("`org` is undefined.")
+
+            if category == 'dailyrandom' and not channel_id:
+                raise ValueError("`ch` is undefined.")
+
+            if category == 'video' and not video_id:
+                raise ValueError("`video_id` is undefined.")
+
+            if category == 'artist' and not channel_id:
+                raise ValueError("`channel_id` is undefined.")
+
+            params = self.__get_path_params(
+                locals(), exclude=["category"],
+                change=['channel_id', 'video_id']
+            )
+
+        return Playlist(**await self.session.get_playlist(endpoint=params))
+
+    async def radio(
+        self,
+        category: Optional[Literal["artist", "hot"]] = None,
+        *,
+        channel_id: Optional[str] = None,
+    ) -> Playlist:
+        if category == "artist" and not channel_id:
+            raise ValueError("`channel_id` is undefined.")
+
+        endpoint = self.__get_path_params(
+            locals(), exclude=["category"],
+            change=['channel_id']
+        )
+
+        return Playlist(**await self.session.get_radio(endpoint=endpoint))
 
     async def close(self) -> None:
         if self.session:
@@ -56,116 +293,45 @@ class MusicdexClient:
     ) -> None:
         await self.close()
 
-    async def hot(
-        self,
-        *,
-        channel_id: Optional[str] = None,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ] = None,
-    ) -> list[Content]:
-        params = self.__get_body_params(locals())
-        if channel_id and org:
-            raise MusicdexParamError("Either `channel_id` or `org` only.")
+    def __get_body_params(
+        self, keys: dict[str, Any],
+        exclude: Optional[list[str]] = None
+    ) -> dict[str, Any]:
+        keys.pop("self")
+        if exclude:
+            for key in exclude:
+                keys.pop(key)
+        return {k: v for k, v in keys.items() if v is not None}
 
-        return [Content(**r) for r in await self.session.get_trending(**params)]
-    
-    @overload
-    async def discovery(
-        self, 
-        category: Literal["channel"], 
-        *,
-        ch: str, 
-    )-> Discovery:
-        ...
-        
-    @overload 
-    async def discovery(
-        self, 
-        category: Literal['org'], 
-        *,
-        org: Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"], 
-    ) -> Discovery:
-        ...
-        
-    async def discovery(
-        self,
-        category: Literal["channel", "org"],
-        *,
-        ch: Optional[str] = None,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ] = None,
-    ) -> Discovery:
-        params = self.__get_body_params(
-            locals(), exclude=["category", "ch", "org"])
-        endpoint = {"channel": f"channel/{ch}", "org": f'org/{org}'}
+    def __get_path_params(
+        self, keys: dict[str, Any],
+        exclude: Optional[list[str]] = None,
+        change: Optional[list[str]] = None
+    ) -> str:
+        keys.pop("self")
+        category = keys.get('category')  # category name
+        # params to change keys name
+        name_scheme = {
+            "channel_id": "ch",
+            "video_id": "id"
+        }
 
-        if category == "channel" and not ch:
-            raise MusicdexParamError("`ch` is undefined.")
+        if change:
+            for k in change:
+                # Use list(params.keys()) to avoid "RuntimeError: dictionary keys changed during iteration"
+                if k not in list(name_scheme.keys()):
+                    continue
 
-        if category == 'org' and not org:
-            raise MusicdexParamError("`org` is undefined.")
+                n = name_scheme.get(k)
+                if not n:
+                    continue
 
-        return Discovery(**await self.session.get_discovery(endpoint=endpoint.get(category), **params))
+                keys.update({n: keys.get(k)})
+                keys.pop(k)  # Remove the old key key from keys
 
-    async def channels(
-        self,
-        *,
-        channel_id: Optional[str] = None,
-        offset: Optional[int] = None,
-        type: Optional[Literal["vtuber"]] = None,
-        order: Optional[Literal["asc", "desc"]] = None,
-        limit: Optional[int] = None,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ] = None,
-        sort: Optional[Literal["latest", "random", "suborg"]] = None,
-    ) -> list[Channel]:
-        params = self.__get_body_params(locals(), exclude=["channel_id"])
-        if channel_id:
-            endpoint = f'/{channel_id}'  # TODO : add channel details endpoint
-            f"{endpoint}" # type: ignore
-            
-        return [Channel(**r) for r in await self.session.get_channels(**params)]
+        if exclude:
+            for key in exclude:
+                keys.pop(key)
 
-    async def playlist(
-        self,
-        type: Optional[
-            Literal["mv", "dailyrandom",
-                    "weekly", "video", "latest"]] = None,
-        *,
-        id: Optional[str] = None,
-        ch: Optional[str] = None,
-        sort: Optional[Literal["latest", "random"]] = None,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ] = None,
-    ) -> Playlist:
-        params = self.__get_path_params(locals(), exclude=["type"])
-        if type in ('weekly', 'mv', 'latest') and not org:
-            raise MusicdexParamError("`org` is undefined.")
-
-        if type == 'dailyrandom' and not ch:
-            raise MusicdexParamError("`ch` is undefined.")
-
-        if type == 'video' and not id:
-            raise MusicdexParamError("`id` is undefined.")
-
-        return Playlist(**await self.session.get_playlist(endpoint=params))
-
-    async def radio(
-        self,
-        type: Literal["artist"],
-        ch: str,
-    ) -> Playlist:
-        params = self.__get_path_params(locals(), exclude=["type"])
-        if not ch and not not type:
-            raise MusicdexParamError("`type` and `ch` is undefined.")
-
-        return Playlist(**await self.session.get_radio(endpoint=params))
+        field = [f"{k}={v}" for k, v in keys.items() if v is not None]
+        return f":{category}[" + ",".join(field) + "]"

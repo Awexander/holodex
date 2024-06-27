@@ -10,19 +10,29 @@ JSONDict = Dict[str, Any]
 
 
 @define(kw_only=True)
-class RecentSingingStream(BaseModel):
-    video: Union[JSONDict, Video, None] = None
-    playlist: Union[JSONDict, Playlist, None] = None
+class RecentSingingStream:
+    __video: Any = field(default=None, init=False, repr=False)
+    __playlist: Any = field(default=None, init=False, repr=False)
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-    
-    def __attrs_post_init__(self):
-        if self.video and isinstance(self.video, dict):
-            self.video = Video(**self.video)
+    def __init__(
+        self,
+        video: Union[JSONDict, Video, None] = None,
+        playlist: Union[JSONDict, Playlist, None] = None,
+        **kwargs: Any
+    ) -> None:
+        self.__video = video
+        self.__playlist = playlist
 
-        if self.playlist and isinstance(self.playlist, dict):
-            self.playlist = Playlist(**self.playlist)
+    def __repr__(self) -> str:
+        return F"RecentSingingStream({self.video},{self.playlist})"
+
+    @property
+    def video(self) -> Video:
+        return Video(**self.__video)
+
+    @property
+    def playlist(self) -> Playlist:
+        return Playlist(**self.__playlist)
 
 
 @define(kw_only=True)
@@ -35,6 +45,7 @@ class Channels(BaseModel):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
 
+
 @define(kw_only=True)
 class Discovery:
     __streams: Any = field(default=None, init=False, repr=False)
@@ -46,7 +57,7 @@ class Discovery:
                  recentSingingStreams: JSONDict,
                  channels: JSONDict,
                  recommended: JSONDict,
-                 **kwargs  # type: ignore
+                 **kwargs: Any
                  ) -> None:
         self.__streams = recentSingingStreams
         self.__channels = channels

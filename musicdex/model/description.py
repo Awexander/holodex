@@ -1,7 +1,7 @@
 
 
 from typing import Union, Optional, Any, Dict
-from attrs import define
+from attrs import define, field
 
 from musicdex.model.channels import Channel
 from musicdex.model.base import BaseModel
@@ -24,14 +24,16 @@ class Description(BaseModel):
     songcount: Optional[int] = None
     mentions: Union[list[JSONDict], list[Channel], None] = None
     channel: Union[JSONDict, Channel, None] = None
+    __mentions: Any = field(default=None, init=False, repr=False)
+    __channel: Any = field(default=None, init=False, repr=False)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        
-    def __attrs_post_init__(self):
-        if self.mentions:
-            self.mentions = [Channel(**r)  # type: ignore
-                             for r in self.mentions]
+        self.__mentions: Any = kwargs.get('mentions')
+        self.__channel: Any = kwargs.get('channel')
 
-        if self.channel and isinstance(self.channel, dict):
-            self.channel = Channel(**self.channel)
+        if self.__channel:
+            self.channel = Channel(**self.__channel)
+
+        if self.__mentions:
+            self.mentions = [Channel(**r) for r in self.__mentions]

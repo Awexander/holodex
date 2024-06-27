@@ -1,6 +1,6 @@
 
 from typing import Union, Optional, Any, Dict
-from attrs import define
+from attrs import define, field
 
 from musicdex.model.trending import Content
 from musicdex.model.description import Description
@@ -16,7 +16,8 @@ class ArtContext(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        
+
+
 @define(kw_only=True)
 class Playlist(BaseModel):
     id: Optional[str] = None
@@ -27,27 +28,33 @@ class Playlist(BaseModel):
     title: Optional[str] = None
     type: Optional[str] = None
     rank: Optional[int] = None
-    description: Union[JSONDict, Description, None] = None
-    content: Union[list[JSONDict], list[Content], None] = None
-    art_context: Union[JSONDict, ArtContext, None] = None
+    description: Union[Description, str, None] = None
+    content: Union[list[Content], None] = None
+    art_context: Union[ArtContext, None] = None
+    __content: Any = field(default=None, init=False, repr=False)
+    __description: Any = field(default=None, init=False, repr=False)
+    __art_context: Any = field(default=None, init=False, repr=False)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        
-    def __attrs_post_init__(self):
-        if self.art_context and isinstance(self.art_context, Dict):
-            self.art_context = ArtContext(**self.art_context)
+        self.__description: Any = kwargs.get('description')
+        self.__content: Any = kwargs.get('content')
+        self.__art_context: Any = kwargs.get('art_context')
 
-        if self.content:
-            self.content = [Content(**r) for r in self.content]  # type: ignore
+        if self.__content:
+            self.content = [Content(**r) for r in self.__content]
 
-        if self.description:
-            if isinstance(self.description, str):
+        if self.__art_context:
+            self.art_context = ArtContext(**self.__art_context)
+
+        if self.__description:
+            if isinstance(self.__description, str):
                 import json
                 try:
-                    self.description = json.loads(self.description)
+                    self.description = json.loads(self.__description)
                 except json.JSONDecodeError:
-                    pass
+                    self.description = self.__description
+                    return
 
-            if isinstance(self.description, dict):
-                self.description = Description(**self.description)
+            self.description = Description(
+                **self.description)  # type: ignore

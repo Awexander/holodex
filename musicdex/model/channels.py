@@ -3,6 +3,7 @@ from attrs import define
 
 from musicdex.model.base import BaseModel
 
+
 @define(kw_only=True)
 class Channel(BaseModel):
     id: Optional[str] = None
@@ -36,6 +37,5 @@ class Channel(BaseModel):
     index_all: Optional[bool] = None
     group: Optional[str] = None
 
-    
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
