@@ -1,5 +1,5 @@
 
-from typing import Any, Optional, Type
+from typing import Any, Optional, Type, overload
 from types import TracebackType
 
 from typing_extensions import Literal
@@ -38,9 +38,6 @@ class MusicdexClient:
             for key in exclude:
                 keys.pop(key)
 
-        if keys.get('type'):
-            keys.pop('type')
-
         params = [f"{k}={v}" for k, v in keys.items() if v is not None]
         return f":{cat}[" + ",".join(params) + "]"
 
@@ -73,7 +70,26 @@ class MusicdexClient:
             raise MusicdexParamError("Either `channel_id` or `org` only.")
 
         return [Content(**r) for r in await self.session.get_trending(**params)]
-
+    
+    @overload
+    async def discovery(
+        self, 
+        category: Literal["channel"], 
+        *,
+        ch: str, 
+    )-> Discovery:
+        ...
+        
+    @overload 
+    async def discovery(
+        self, 
+        category: Literal['org'], 
+        *,
+        org: Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"], 
+    ) -> Discovery:
+        ...
+        
     async def discovery(
         self,
         category: Literal["channel", "org"],

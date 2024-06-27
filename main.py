@@ -22,8 +22,7 @@ async def main():
         await musicdex.hot(channel_id=gura_channel_id)
 
         # radio endpoint
-        radio = await musicdex.radio('artist', ch=gura_channel_id)
-        print(radio.id)
+        await musicdex.radio('artist', ch=gura_channel_id)
         
         # raised error test
         await musicdex.playlist(type="mv")
