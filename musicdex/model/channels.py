@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Any
 from attrs import define
 
+from musicdex.model.base import BaseModel
 
 @define(kw_only=True)
-class Channel:
+class Channel(BaseModel):
     id: Optional[str] = None
     name: Optional[str] = None
     english_name: Optional[str] = None
@@ -34,3 +35,7 @@ class Channel:
     extra_ids: Optional[str] = None
     index_all: Optional[bool] = None
     group: Optional[str] = None
+
+    
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)

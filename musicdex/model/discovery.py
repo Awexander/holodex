@@ -4,15 +4,19 @@ from attrs import define, field
 
 from musicdex.model.playlist import Playlist
 from musicdex.model.video import Video
+from musicdex.model.base import BaseModel
 
 JSONDict = Dict[str, Any]
 
 
 @define(kw_only=True)
-class RecentSingingStream:
+class RecentSingingStream(BaseModel):
     video: Union[JSONDict, Video, None] = None
     playlist: Union[JSONDict, Playlist, None] = None
 
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+    
     def __attrs_post_init__(self):
         if self.video and isinstance(self.video, dict):
             self.video = Video(**self.video)
@@ -22,12 +26,14 @@ class RecentSingingStream:
 
 
 @define(kw_only=True)
-class Channels:
+class Channels(BaseModel):
     id: Optional[str] = None
     name: Optional[str] = None
     english_name: Optional[str] = None
     song_count: Optional[str] = None
 
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
 
 @define(kw_only=True)
 class Discovery:

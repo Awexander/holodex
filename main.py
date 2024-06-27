@@ -5,11 +5,10 @@ import dotenv
 
 url = 'https://www.youtube.com/watch?v=uIloWxQ3Rpo'
 
-
 async def main():
     APIKEY = dotenv.dotenv_values().get('APIKEY')
     gura_channel_id = 'UCoSrY_IQQVpmIRZ9Xf-y93g'
-
+    
     async with MusicdexClient(key=APIKEY) as musicdex:
         # channels
         await musicdex.channels(org="Hololive")
@@ -23,7 +22,11 @@ async def main():
         await musicdex.hot(channel_id=gura_channel_id)
 
         # radio endpoint
-        await musicdex.radio('artist', ch=gura_channel_id)
+        radio = await musicdex.radio('artist', ch=gura_channel_id)
+        print(radio.id)
+        
+        # raised error test
+        await musicdex.playlist(type="mv")
 
 if __name__ == "__main__":
     asyncio.run(main())

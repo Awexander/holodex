@@ -4,18 +4,21 @@ from attrs import define
 
 from musicdex.model.trending import Content
 from musicdex.model.description import Description
+from musicdex.model.base import BaseModel
 
 JSONDict = Dict[str, Any]
 
 
 @define(kw_only=True)
-class ArtContext:
+class ArtContext(BaseModel):
     channels: Optional[list[str]] = None
     videos: Optional[list[str]] = None
 
-
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        
 @define(kw_only=True)
-class Playlist:
+class Playlist(BaseModel):
     id: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
@@ -28,6 +31,9 @@ class Playlist:
     content: Union[list[JSONDict], list[Content], None] = None
     art_context: Union[JSONDict, ArtContext, None] = None
 
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        
     def __attrs_post_init__(self):
         if self.art_context and isinstance(self.art_context, Dict):
             self.art_context = ArtContext(**self.art_context)

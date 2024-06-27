@@ -113,7 +113,8 @@ class MusicdexClient:
         params = self.__get_body_params(locals(), exclude=["channel_id"])
         if channel_id:
             endpoint = f'/{channel_id}'  # TODO : add channel details endpoint
-
+            f"{endpoint}" # type: ignore
+            
         return [Channel(**r) for r in await self.session.get_channels(**params)]
 
     async def playlist(
@@ -146,7 +147,7 @@ class MusicdexClient:
         self,
         type: Literal["artist"],
         ch: str,
-    ) -> Any:
+    ) -> Playlist:
         params = self.__get_path_params(locals(), exclude=["type"])
         if not ch and not not type:
             raise MusicdexParamError("`type` and `ch` is undefined.")
