@@ -10,6 +10,7 @@ async def main():
 
     async with MusicdexClient(key=APIKEY) as musicdex:
         # latest songs
+        await musicdex.latest(channel_id=channel_id)
         await musicdex.latest(org="Hololive", limit=20)
 
         # channels
