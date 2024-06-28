@@ -1,4 +1,3 @@
-
 from typing import Optional, Any, Dict
 from attrs import define, field
 
@@ -24,6 +23,6 @@ class Video(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.__channel: Any = kwargs.get('channel')
+        self.__channel: Any = kwargs.get("channel")
         if self.__channel:
             self.channel = Channel(**self.__channel)

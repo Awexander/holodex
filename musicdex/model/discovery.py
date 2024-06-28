@@ -1,4 +1,3 @@
-
 from typing import Optional, Union, Any, Dict
 from attrs import define, field
 
@@ -18,13 +17,13 @@ class RecentSingingStream:
         self,
         video: Union[JSONDict, Video, None] = None,
         playlist: Union[JSONDict, Playlist, None] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         self.__video = video
         self.__playlist = playlist
 
     def __repr__(self) -> str:
-        return F"RecentSingingStream({self.video},{self.playlist})"
+        return f"RecentSingingStream({self.video},{self.playlist})"
 
     @property
     def video(self) -> Video:
@@ -32,13 +31,14 @@ class RecentSingingStream:
             return Video(**self.__video)
 
         return Video()
-    
+
     @property
     def playlist(self) -> Playlist:
         if self.__playlist:
             return Playlist(**self.__playlist)
 
         return Playlist()
+
 
 @define(kw_only=True)
 class Channels(BaseModel):
@@ -57,19 +57,20 @@ class Discovery:
     __channels: Any = field(default=None, init=False, repr=False)
     __recommended: Any = field(default=None, init=False, repr=False)
 
-    def __init__(self,
-                 *,
-                 recentSingingStreams: JSONDict,
-                 channels: JSONDict,
-                 recommended: JSONDict,
-                 **kwargs: Any
-                 ) -> None:
+    def __init__(
+        self,
+        *,
+        recentSingingStreams: JSONDict,
+        channels: JSONDict,
+        recommended: JSONDict,
+        **kwargs: Any,
+    ) -> None:
         self.__streams = recentSingingStreams
         self.__channels = channels
         self.__recommended = recommended
 
     def __repr__(self) -> str:
-        return F"Discovery({self.streams},{self.channels},{self.recommended})"
+        return f"Discovery({self.streams},{self.channels},{self.recommended})"
 
     @property
     def streams(self) -> list[RecentSingingStream]:
@@ -81,4 +82,4 @@ class Discovery:
 
     @property
     def recommended(self) -> list[Playlist]:
-        return [Playlist(**r) for r in self.__recommended.get('playlists')]
+        return [Playlist(**r) for r in self.__recommended.get("playlists")]

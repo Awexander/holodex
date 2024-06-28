@@ -1,4 +1,3 @@
-
 from typing import Any, Optional, Type
 from types import TracebackType
 from aiohttp import ClientSession
@@ -57,21 +56,32 @@ class MusicdexHttpClient:
     async def get_trending(self, **params: JSONDict) -> Any:
         return await self.request("GET", f"/songs/hot", params=params)
 
-    async def get_discovery(self, endpoint: Optional[str] = None, **params: JSONDict) -> Any:
-        return await self.request("GET", f"/musicdex/discovery/{endpoint}", params=params)
+    async def get_discovery(
+        self, endpoint: Optional[str] = None, **params: JSONDict
+    ) -> Any:
+        return await self.request(
+            "GET", f"/musicdex/discovery/{endpoint}", params=params
+        )
 
     async def get_channels(self, **params: JSONDict) -> Any:
         return await self.request(
-            "GET", f"/channels", params={"limit": 100, "offset": 0, **params})
+            "GET", f"/channels", params={"limit": 100, "offset": 0, **params}
+        )
 
     async def get_channels_details(self, endpoint: str, **params: JSONDict) -> Any:
-        return await self.request("GET", endpoint=f'/channels/{endpoint}', **params)
+        return await self.request("GET", endpoint=f"/channels/{endpoint}", **params)
 
     async def get_playlist(self, endpoint: str, **params: JSONDict) -> Any:
-        return await self.request("GET", F"/musicdex/playlist/{endpoint}", params=params)
+        return await self.request(
+            "GET", f"/musicdex/playlist/{endpoint}", params=params
+        )
 
-    async def get_radio(self, endpoint: Optional[str] = None, **params: JSONDict) -> Any:
+    async def get_radio(
+        self, endpoint: Optional[str] = None, **params: JSONDict
+    ) -> Any:
         return await self.request("GET", f"/musicdex/radio/{endpoint}", params=params)
 
     async def get_latest(self, **params: JSONDict) -> Any:
-        return await self.request("POST", f"/songs/latest", data={"limit":50, "offset": 0, **params})
+        return await self.request(
+            "POST", f"/songs/latest", data={"limit": 50, "offset": 0, **params}
+        )

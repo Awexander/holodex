@@ -1,13 +1,13 @@
-
 import pytest_asyncio
 from collections.abc import AsyncGenerator
 from dotenv import dotenv_values
 from holodex.client import HolodexClient
 from musicdex.client import MusicdexClient
 
+
 @pytest_asyncio.fixture()
 async def holodex() -> AsyncGenerator[HolodexClient, None]:
-    APIKEY = dotenv_values().get('APIKEY')
+    APIKEY = dotenv_values().get("APIKEY")
     client = HolodexClient(key=APIKEY)
     print(client)
     yield client

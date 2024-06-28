@@ -1,11 +1,11 @@
-
-
 from typing import Optional, Any, Dict
 from attrs import define, field
 
 from musicdex.model.base import BaseModel
 from musicdex.model.channels import Channel
+
 JSONDict = Dict[str, Any]
+
 
 @define(kw_only=True)
 class Songs(BaseModel):
@@ -32,6 +32,6 @@ class Songs(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.__channel: Any = kwargs.get('channel')
+        self.__channel: Any = kwargs.get("channel")
         if self.__channel:
             self.channel = Channel(**self.__channel)

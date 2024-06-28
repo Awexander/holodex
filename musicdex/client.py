@@ -1,4 +1,3 @@
-
 from typing import Any, Optional, Type, overload
 from types import TracebackType
 
@@ -19,44 +18,34 @@ class MusicdexClient:
 
     @overload
     async def hot(
-        self,
-        *,
-        org: Literal["All Vtubers", "Hololive",
-                     "Nijisanji", "Independents"]
+        self, *, org: Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
     ) -> list[Songs]:
         ...
 
     @overload
-    async def hot(
-        self,
-        *,
-        channel_id: str
-    ) -> list[Songs]:
+    async def hot(self, *, channel_id: str) -> list[Songs]:
         ...
 
-    @overload 
+    @overload
     async def latest(
         self,
         *,
-        org: Literal[
-            "All Vtubers", "Hololive",
-            "Nijisanji", "Independents"
-        ],
+        org: Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"],
         limit: Optional[int] = 50,
         offset: Optional[int] = 0,
     ) -> list[Songs]:
         ...
-    
+
     @overload
     async def latest(
-        self, 
+        self,
         *,
         channel_id: str,
         limit: Optional[int] = 50,
         offset: Optional[int] = 0,
     ) -> list[Songs]:
         ...
-        
+
     @overload
     async def hot(self) -> list[Songs]:
         ...
@@ -73,10 +62,9 @@ class MusicdexClient:
     @overload
     async def discovery(
         self,
-        category: Literal['org'],
+        category: Literal["org"],
         *,
-        org: Literal["All Vtubers", "Hololive",
-                     "Nijisanji", "Independents"],
+        org: Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"],
     ) -> Discovery:
         ...
 
@@ -84,10 +72,7 @@ class MusicdexClient:
     async def channels(
         self,
         *,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ],
+        org: Optional[Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]],
         offset: Optional[str] = None,
         limit: Optional[int] = None,
         type: Optional[Literal["vtuber"]] = None,
@@ -96,10 +81,7 @@ class MusicdexClient:
         ...
 
     @overload
-    async def channels(
-        self,
-        channel_id: str
-    ) -> list[Channel]:
+    async def channels(self, channel_id: str) -> list[Channel]:
         ...
 
     @overload
@@ -107,18 +89,14 @@ class MusicdexClient:
         self,
         category: Literal["mv"],
         *,
-        org: Literal["All Vtubers", "Hololive",
-                     "Nijisanji", "Independents"],
-        sort: Optional[Literal["random", "latest"]] = None
+        org: Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"],
+        sort: Optional[Literal["random", "latest"]] = None,
     ) -> Playlist:
         ...
 
     @overload
     async def playlist(
-        self,
-        category: Literal["dailyrandom"],
-        *,
-        channel_id: str
+        self, category: Literal["dailyrandom"], *, channel_id: str
     ) -> Playlist:
         ...
 
@@ -127,20 +105,12 @@ class MusicdexClient:
         self,
         category: Literal["weekly"],
         *,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ]
+        org: Optional[Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]],
     ) -> Playlist:
         ...
 
     @overload
-    async def playlist(
-        self,
-        category: Literal["video"],
-        *,
-        video_id: str
-    ) -> Playlist:
+    async def playlist(self, category: Literal["video"], *, video_id: str) -> Playlist:
         ...
 
     @overload
@@ -148,10 +118,7 @@ class MusicdexClient:
         self,
         category: Literal["latest"],
         *,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ]
+        org: Optional[Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]],
     ) -> Playlist:
         ...
 
@@ -160,28 +127,18 @@ class MusicdexClient:
         self,
         category: Literal["hot"],
         *,
-        org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
-        ]
+        org: Optional[Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]],
     ) -> Playlist:
         ...
 
     @overload
     async def playlist(
-        self,
-        category: Literal["artist"],
-        *,
-        channel_id: str
+        self, category: Literal["artist"], *, channel_id: str
     ) -> Playlist:
         ...
 
     @overload
-    async def playlist(
-        self,
-        *,
-        playlist_id: str
-    ) -> Playlist:
+    async def playlist(self, *, playlist_id: str) -> Playlist:
         ...
 
     async def hot(
@@ -189,8 +146,7 @@ class MusicdexClient:
         *,
         channel_id: Optional[str] = None,
         org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
+            Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
         ] = None,
     ) -> list[Songs]:
         if channel_id and org:
@@ -208,21 +164,25 @@ class MusicdexClient:
         *,
         channel_id: Optional[str] = None,
         org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
+            Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
         ] = None,
     ) -> Discovery:
-        endpoint = {"channel": f"channel/{channel_id}", "org": f'org/{org}'}
+        endpoint = {"channel": f"channel/{channel_id}", "org": f"org/{org}"}
 
         if category == "channel" and not channel_id:
             raise ValueError("`channel_id` is undefined.")
 
-        if category == 'org' and not org:
+        if category == "org" and not org:
             raise ValueError("`org` is undefined.")
 
         params = self.__get_body_params(
-            locals(), exclude=["category", "channel_id", "org", 'endpoint'])
-        return Discovery(**await self.session.get_discovery(endpoint=endpoint.get(category), **params))
+            locals(), exclude=["category", "channel_id", "org", "endpoint"]
+        )
+        return Discovery(
+            **await self.session.get_discovery(
+                endpoint=endpoint.get(category), **params
+            )
+        )
 
     async def channels(  # type: ignore
         self,
@@ -232,8 +192,7 @@ class MusicdexClient:
         type: Optional[Literal["vtuber"]] = None,
         limit: Optional[int] = None,
         org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
+            Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
         ] = None,
         sort: Optional[Literal["latest", "random", "suborg"]] = None,
     ) -> list[Channel] | Channel:
@@ -246,9 +205,7 @@ class MusicdexClient:
     async def playlist(
         self,
         category: Optional[
-            Literal["mv", "dailyrandom",
-                    "weekly", "video", "latest",
-                    "hot", "artist"]
+            Literal["mv", "dailyrandom", "weekly", "video", "latest", "hot", "artist"]
         ] = None,
         *,
         playlist_id: Optional[str] = None,
@@ -256,29 +213,27 @@ class MusicdexClient:
         channel_id: Optional[str] = None,
         sort: Optional[Literal["latest", "random"]] = None,
         org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
+            Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
         ] = None,
     ) -> Playlist:
         if playlist_id is not None:
             params = playlist_id
 
         else:
-            if category in ('weekly', 'mv', 'latest', 'hot') and not org:
+            if category in ("weekly", "mv", "latest", "hot") and not org:
                 raise ValueError("`org` is undefined.")
 
-            if category == 'dailyrandom' and not channel_id:
+            if category == "dailyrandom" and not channel_id:
                 raise ValueError("`ch` is undefined.")
 
-            if category == 'video' and not video_id:
+            if category == "video" and not video_id:
                 raise ValueError("`video_id` is undefined.")
 
-            if category == 'artist' and not channel_id:
+            if category == "artist" and not channel_id:
                 raise ValueError("`channel_id` is undefined.")
 
             params = self.__get_path_params(
-                locals(), exclude=["category"],
-                change=['channel_id', 'video_id']
+                locals(), exclude=["category"], change=["channel_id", "video_id"]
             )
 
         return Playlist(**await self.session.get_playlist(endpoint=params))
@@ -293,33 +248,31 @@ class MusicdexClient:
             raise ValueError("`channel_id` is undefined.")
 
         endpoint = self.__get_path_params(
-            locals(), exclude=["category"],
-            change=['channel_id']
+            locals(), exclude=["category"], change=["channel_id"]
         )
 
         return Playlist(**await self.session.get_radio(endpoint=endpoint))
 
     async def latest(
-        self, 
+        self,
         *,
         channel_id: Optional[str] = None,
         org: Optional[
-            Literal["All Vtubers", "Hololive",
-                    "Nijisanji", "Independents"]
+            Literal["All Vtubers", "Hololive", "Nijisanji", "Independents"]
         ] = None,
         limit: Optional[int] = 50,
-        offset: Optional[int] = 0
+        offset: Optional[int] = 0,
     ) -> list[Songs]:
         excludes = ["channel_id", "org"]
         if channel_id:
             excludes = ["org"]
-        
+
         if org:
             excludes = ["channel_id"]
-            
+
         params = self.__get_body_params(locals(), exclude=excludes)
         return [Songs(**r) for r in await self.session.get_latest(**params)]
-    
+
     async def close(self) -> None:
         if self.session:
             await self.session.close()
@@ -336,8 +289,7 @@ class MusicdexClient:
         await self.close()
 
     def __get_body_params(
-        self, keys: dict[str, Any],
-        exclude: Optional[list[str]] = None
+        self, keys: dict[str, Any], exclude: Optional[list[str]] = None
     ) -> dict[str, Any]:
         keys.pop("self")
         if exclude:
@@ -346,17 +298,15 @@ class MusicdexClient:
         return {k: v for k, v in keys.items() if v is not None}
 
     def __get_path_params(
-        self, keys: dict[str, Any],
+        self,
+        keys: dict[str, Any],
         exclude: Optional[list[str]] = None,
-        change: Optional[list[str]] = None
+        change: Optional[list[str]] = None,
     ) -> str:
         keys.pop("self")
-        category = keys.get('category')  # category name
+        category = keys.get("category")  # category name
         # params to change keys name
-        name_scheme = {
-            "channel_id": "ch",
-            "video_id": "id"
-        }
+        name_scheme = {"channel_id": "ch", "video_id": "id"}
 
         if change:
             for k in change:

@@ -1,4 +1,3 @@
-
 from typing import Union, Optional, Any, Dict
 from attrs import define, field
 
@@ -37,9 +36,9 @@ class Playlist(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.__description: Any = kwargs.get('description')
-        self.__content: Any = kwargs.get('content')
-        self.__art_context: Any = kwargs.get('art_context')
+        self.__description: Any = kwargs.get("description")
+        self.__content: Any = kwargs.get("content")
+        self.__art_context: Any = kwargs.get("art_context")
 
         if self.__content:
             self.content = [Songs(**r) for r in self.__content]
@@ -49,6 +48,7 @@ class Playlist(BaseModel):
 
         if self.__description:
             import json
+
             try:
                 self.description = json.loads(self.__description)
             except json.JSONDecodeError:

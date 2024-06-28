@@ -1,10 +1,9 @@
-
 __all__ = (
     "HolodexEndpointError",
     "MusicdexEndpointError",
     "MusicdexParamError",
     "MusicdexNotImplementError",
-    "HolodexNotImplementError"
+    "HolodexNotImplementError",
 )
 
 
@@ -25,8 +24,8 @@ class MusicdexEndpointParamError(Exception):
 
 
 class MusicdexNotImplementError(Exception):
-    """Not Implement Error """
+    """Not Implement Error"""
 
 
 class HolodexNotImplementError(Exception):
-    """Not Implement Error """
+    """Not Implement Error"""

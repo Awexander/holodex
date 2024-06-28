@@ -1,5 +1,3 @@
-
-
 from typing import Union, Optional, Any, Dict
 from attrs import define, field
 
@@ -29,8 +27,8 @@ class Description(BaseModel):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.__mentions: Any = kwargs.get('mentions')
-        self.__channel: Any = kwargs.get('channel')
+        self.__mentions: Any = kwargs.get("mentions")
+        self.__channel: Any = kwargs.get("channel")
 
         if self.__channel:
             self.channel = Channel(**self.__channel)
