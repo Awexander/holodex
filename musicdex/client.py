@@ -35,7 +35,7 @@ class MusicdexClient:
         ...
 
     @overload
-    async def hot(self) -> Playlist:
+    async def hot(self) -> list[Content]:
         ...
 
     @overload
@@ -87,7 +87,7 @@ class MusicdexClient:
         *,
         org: Literal["All Vtubers", "Hololive",
                      "Nijisanji", "Independents"],
-        sort: Literal["random", "latest"]
+        sort: Optional[Literal["random", "latest"]] = None
     ) -> Playlist:
         ...
 
@@ -170,12 +170,12 @@ class MusicdexClient:
             Literal["All Vtubers", "Hololive",
                     "Nijisanji", "Independents"]
         ] = None,
-    ) -> list[Content] | Playlist:
+    ) -> list[Content]:
         if channel_id and org:
             raise ValueError("Either `channel_id` or `org` only.")
 
-        if not channel_id and org:
-            return await self.radio(category="hot")
+        # if not channel_id and not org:
+        #     return await self.radio(category="hot")
 
         params = self.__get_body_params(locals())
         return [Content(**r) for r in await self.session.get_trending(**params)]

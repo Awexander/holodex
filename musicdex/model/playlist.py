@@ -28,7 +28,7 @@ class Playlist(BaseModel):
     title: Optional[str] = None
     type: Optional[str] = None
     rank: Optional[int] = None
-    description: Union[Description, str, None] = None
+    description: Union[JSONDict, Description, str, None] = None
     content: Union[list[Content], None] = None
     art_context: Union[ArtContext, None] = None
     __content: Any = field(default=None, init=False, repr=False)
@@ -56,5 +56,5 @@ class Playlist(BaseModel):
                     self.description = self.__description
                     return
 
-            self.description = Description(
-                **self.description)  # type: ignore
+            # self.description = Description(
+            #     **self.description)  # type: ignore

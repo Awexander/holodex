@@ -4,18 +4,8 @@ from typing import Optional, Any, Dict
 from attrs import define, field
 
 from musicdex.model.base import BaseModel
-
+from musicdex.model.channels import Channel
 JSONDict = Dict[str, Any]
-
-
-@define(kw_only=True)
-class Channel(BaseModel):
-    name: Optional[str] = None
-    english_name: Optional[str] = None
-
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-
 
 @define(kw_only=True)
 class Content(BaseModel):

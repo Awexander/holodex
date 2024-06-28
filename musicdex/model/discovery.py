@@ -28,12 +28,17 @@ class RecentSingingStream:
 
     @property
     def video(self) -> Video:
-        return Video(**self.__video)
+        if self.__video:
+            return Video(**self.__video)
 
+        return Video()
+    
     @property
     def playlist(self) -> Playlist:
-        return Playlist(**self.__playlist)
+        if self.__playlist:
+            return Playlist(**self.__playlist)
 
+        return Playlist()
 
 @define(kw_only=True)
 class Channels(BaseModel):

@@ -52,7 +52,6 @@ class MusicdexHttpClient:
             headers=self.headers,
             **kwargs,
         ) as r:
-            print(f"Endpoint: {endpoint}")
             return await r.json()
 
     async def get_trending(self, **params: JSONDict) -> Any:
