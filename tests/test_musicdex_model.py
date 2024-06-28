@@ -3,7 +3,7 @@ from musicdex.model.playlist import Playlist, ArtContext
 from musicdex.model.channels import Channel
 from musicdex.model.description import Description
 from musicdex.model.discovery import Discovery, RecentSingingStream, Channels
-from musicdex.model.trending import Content
+from musicdex.model.songs import Songs
 from musicdex.model.video import Video
 
 async def assert_discovery(response: Discovery | list[Discovery]):
@@ -31,9 +31,9 @@ async def assert_discovery(response: Discovery | list[Discovery]):
     if isinstance(response, Discovery):
         await check(response)
 
-async def assert_content(response: Content | list[Content]):
-    async def check(resp: Content):
-        assert isinstance(resp, Content)
+async def assert_songs(response: Songs | list[Songs]):
+    async def check(resp: Songs):
+        assert isinstance(resp, Songs)
         assert (
             isinstance(resp.channel, Channel) or
             isinstance(resp.channel, list)
@@ -45,7 +45,7 @@ async def assert_content(response: Content | list[Content]):
         for resp in response:
             await check(resp)
             
-    if isinstance(response, Content):
+    if isinstance(response, Songs):
         await check(response)
 
 async def assert_channels(response: Channel | list[Channel]):
@@ -74,7 +74,7 @@ async def assert_playlist(response: Playlist | list[Playlist]):
         if resp.content:
             assert isinstance(resp.content, list)
             for r in resp.content:
-                assert isinstance(r, Content)
+                assert isinstance(r, Songs)
             
         if resp.description is not None:
             assert (

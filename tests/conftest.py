@@ -6,7 +6,7 @@ from holodex.client import HolodexClient
 from musicdex.client import MusicdexClient
 
 @pytest_asyncio.fixture()
-async def holodex() -> AsyncGenerator[HolodexClient]:
+async def holodex() -> AsyncGenerator[HolodexClient, None]:
     APIKEY = dotenv_values().get('APIKEY')
     client = HolodexClient(key=APIKEY)
     print(client)
@@ -16,7 +16,7 @@ async def holodex() -> AsyncGenerator[HolodexClient]:
 
 
 @pytest_asyncio.fixture()
-async def musicdex() -> AsyncGenerator[MusicdexClient]:
+async def musicdex() -> AsyncGenerator[MusicdexClient, None]:
     APIKEY = dotenv_values().get("APIKEY")
     client = MusicdexClient(key=APIKEY)
     yield client

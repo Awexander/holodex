@@ -72,3 +72,6 @@ class MusicdexHttpClient:
 
     async def get_radio(self, endpoint: Optional[str] = None, **params: JSONDict) -> Any:
         return await self.request("GET", f"/musicdex/radio/{endpoint}", params=params)
+
+    async def get_latest(self, **params: JSONDict) -> Any:
+        return await self.request("POST", f"/songs/latest", data={"limit":50, "offset": 0, **params})

@@ -4,7 +4,7 @@ from types import TracebackType
 
 from typing_extensions import Literal
 
-from musicdex.model.trending import Content
+from musicdex.model.songs import Songs
 from musicdex.model.discovery import Discovery
 from musicdex.model.channels import Channel
 from musicdex.model.discovery import Playlist
@@ -23,7 +23,7 @@ class MusicdexClient:
         *,
         org: Literal["All Vtubers", "Hololive",
                      "Nijisanji", "Independents"]
-    ) -> list[Content]:
+    ) -> list[Songs]:
         ...
 
     @overload
@@ -31,11 +31,34 @@ class MusicdexClient:
         self,
         *,
         channel_id: str
-    ) -> list[Content]:
+    ) -> list[Songs]:
         ...
 
+    @overload 
+    async def latest(
+        self,
+        *,
+        org: Literal[
+            "All Vtubers", "Hololive",
+            "Nijisanji", "Independents"
+        ],
+        limit: Optional[int] = 50,
+        offset: Optional[int] = 0,
+    ) -> list[Songs]:
+        ...
+    
     @overload
-    async def hot(self) -> list[Content]:
+    async def latest(
+        self, 
+        *,
+        channel_id: str,
+        limit: Optional[int] = 50,
+        offset: Optional[int] = 0,
+    ) -> list[Songs]:
+        ...
+        
+    @overload
+    async def hot(self) -> list[Songs]:
         ...
 
     @overload
@@ -68,7 +91,6 @@ class MusicdexClient:
         offset: Optional[str] = None,
         limit: Optional[int] = None,
         type: Optional[Literal["vtuber"]] = None,
-        order: Optional[Literal["asc", "desc"]] = None,
         sort: Optional[Literal["latest", "random", "suborg"]] = None,
     ) -> list[Channel]:
         ...
@@ -170,7 +192,7 @@ class MusicdexClient:
             Literal["All Vtubers", "Hololive",
                     "Nijisanji", "Independents"]
         ] = None,
-    ) -> list[Content]:
+    ) -> list[Songs]:
         if channel_id and org:
             raise ValueError("Either `channel_id` or `org` only.")
 
@@ -178,7 +200,7 @@ class MusicdexClient:
         #     return await self.radio(category="hot")
 
         params = self.__get_body_params(locals())
-        return [Content(**r) for r in await self.session.get_trending(**params)]
+        return [Songs(**r) for r in await self.session.get_trending(**params)]
 
     async def discovery(
         self,
@@ -208,7 +230,6 @@ class MusicdexClient:
         channel_id: Optional[str] = None,
         offset: Optional[int] = None,
         type: Optional[Literal["vtuber"]] = None,
-        order: Optional[Literal["asc", "desc"]] = None,
         limit: Optional[int] = None,
         org: Optional[
             Literal["All Vtubers", "Hololive",
@@ -278,6 +299,27 @@ class MusicdexClient:
 
         return Playlist(**await self.session.get_radio(endpoint=endpoint))
 
+    async def latest(
+        self, 
+        *,
+        channel_id: Optional[str] = None,
+        org: Optional[
+            Literal["All Vtubers", "Hololive",
+                    "Nijisanji", "Independents"]
+        ] = None,
+        limit: Optional[int] = 50,
+        offset: Optional[int] = 0
+    ) -> list[Songs]:
+        excludes = ["channel_id", "org"]
+        if channel_id:
+            excludes = ["org"]
+        
+        if org:
+            excludes = ["channel_id"]
+            
+        params = self.__get_body_params(locals(), exclude=excludes)
+        return [Songs(**r) for r in await self.session.get_latest(**params)]
+    
     async def close(self) -> None:
         if self.session:
             await self.session.close()

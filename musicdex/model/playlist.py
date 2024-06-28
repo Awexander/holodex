@@ -2,7 +2,7 @@
 from typing import Union, Optional, Any, Dict
 from attrs import define, field
 
-from musicdex.model.trending import Content
+from musicdex.model.songs import Songs
 from musicdex.model.description import Description
 from musicdex.model.base import BaseModel
 
@@ -29,7 +29,7 @@ class Playlist(BaseModel):
     type: Optional[str] = None
     rank: Optional[int] = None
     description: Union[JSONDict, Description, str, None] = None
-    content: Union[list[Content], None] = None
+    content: Union[list[Songs], None] = None
     art_context: Union[ArtContext, None] = None
     __content: Any = field(default=None, init=False, repr=False)
     __description: Any = field(default=None, init=False, repr=False)
@@ -42,7 +42,7 @@ class Playlist(BaseModel):
         self.__art_context: Any = kwargs.get('art_context')
 
         if self.__content:
-            self.content = [Content(**r) for r in self.__content]
+            self.content = [Songs(**r) for r in self.__content]
 
         if self.__art_context:
             self.art_context = ArtContext(**self.__art_context)

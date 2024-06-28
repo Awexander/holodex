@@ -8,7 +8,7 @@ from musicdex.model.channels import Channel
 JSONDict = Dict[str, Any]
 
 @define(kw_only=True)
-class Content(BaseModel):
+class Songs(BaseModel):
     score: Optional[int] = None
     id: Optional[str] = None
     channel_id: Optional[str] = None
