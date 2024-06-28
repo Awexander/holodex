@@ -48,13 +48,12 @@ class Playlist(BaseModel):
             self.art_context = ArtContext(**self.__art_context)
 
         if self.__description:
-            if isinstance(self.__description, str):
-                import json
-                try:
-                    self.description = json.loads(self.__description)
-                except json.JSONDecodeError:
-                    self.description = self.__description
-                    return
+            import json
+            try:
+                self.description = json.loads(self.__description)
+            except json.JSONDecodeError:
+                self.description = self.__description
+                return
 
             # self.description = Description(
             #     **self.description)  # type: ignore
