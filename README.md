@@ -2,6 +2,8 @@
 
 > Holodex and Musicdex api wrapper
 
+### Musicdex api are scraped from [music.holodex.net](https://music.holodex.net/) and not officially documented by holodex team.
+
 ## Example Holodex
 
 ```py
